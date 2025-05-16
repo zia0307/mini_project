@@ -1,5 +1,5 @@
-#include <stdio.h>   // for printf, scanf, getchar
-#include <string.h>  // for strcpy, strcmp
+#include <stdio.h>
+#include <string.h>
 #include "dietplanner.h"
 #define MAX_ALLERGIES 5
 #define MAX_RESTRICTIONS 5
@@ -19,7 +19,7 @@ printf("\nDo you have any dietary restrictions or medical conditions? (enter num
 scanf("%d", restrictionCount);
 
 for (int i = 0; i < *restrictionCount; i++) {
-printf("Enter restriction %d (e.g. vegetarian, diabetic): ", i + 1);
+printf("Enter restriction %d (enter vegetarian, diabetic, halal, vegan, gluten-free): ", i + 1);
 scanf("%s", restrictions[i]);
 }
 }

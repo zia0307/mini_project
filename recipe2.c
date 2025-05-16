@@ -78,7 +78,6 @@ void suggestRecipes(Recipe recipes[], int recipeCount, char availableIngredients
         printf("No recipes available based on your ingredients, allergies, and diet plan.\n");
 }
 
-
 void getAvailableIngredients(char availableIngredients[MAX_INGREDIENTS][50], int *availableCount) {
     printf("\nHow many ingredients do you have available? ");
     scanf("%d", availableCount);

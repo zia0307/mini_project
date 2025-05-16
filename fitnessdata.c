@@ -12,7 +12,8 @@ void getFitnessGoal(char *goal) {
     printf("Enter your choice (1/2/3): ");
     
     scanf("%d", &choice);
-    while ((getchar()) != '\n');  // Clear input buffer
+    //while ((ch = getchar()) != '\n' && ch!=EOF);  // Clear input buffer
+    fflush(stdin); //clear input buffer 
 
     switch (choice) {
         case 1:
