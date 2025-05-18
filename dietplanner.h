@@ -2,8 +2,9 @@
 #define DIETPLANNER_H
 
 #include <stdio.h>
-#include<string.h>
+#include <string.h>
 
+// Constants
 #define MAX_INGREDIENTS 20
 #define MAX_ALLERGIES 5
 #define MAX_RESTRICTIONS 5
@@ -38,4 +39,4 @@ void getAvailableIngredients(char availableIngredients[MAX_INGREDIENTS][50], int
 void suggestRecipes(Recipe recipes[], int recipeCount, char availableIngredients[MAX_INGREDIENTS][50],
                     int availableCount, char allergies[MAX_ALLERGIES][50], int allergyCount, char dietType[50]);
 
-#endif
+#endif // DIETPLANNER_H

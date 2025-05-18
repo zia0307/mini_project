@@ -1,34 +1,29 @@
-#include <stdio.h>   // for printf, scanf, getchar
-#include <string.h>  // for strcpy, strcmp
 #include "dietplanner.h"
 
-float calculateCalories(float weight, float height, int age, char sex, char goal[20], char *dietType) {
-    float bmr;
+#ifdef _WIN32
+#define DLL_EXPORT __declspec(dllexport)
+#else
+#define DLL_EXPORT
+#endif
 
-    // Convert height to cm
-    height = height * 100;
+DLL_EXPORT float calculateCalories(float weight, float height, int age, char sex, char goal[20], char *dietType) {
+    float calories;
 
     if (sex == 'M' || sex == 'm') {
-        bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+        calories = 10 * weight + 6.25 * height * 100 - 5 * age + 5;
     } else {
-        bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+        calories = 10 * weight + 6.25 * height * 100 - 5 * age - 161;
     }
 
-    float maintenanceCalories = bmr * 1.2; // Sedentary activity level
-
-    float finalCalories;
-
-
     if (strcmp(goal, "bulk") == 0) {
-        finalCalories = maintenanceCalories + 500;
+        calories += 500;
         strcpy(dietType, "high_calorie_high_protein");
     } else if (strcmp(goal, "cut") == 0) {
-        finalCalories = maintenanceCalories - 500;
+        calories -= 500;
         strcpy(dietType, "low_calorie_low_carb");
     } else {
-        finalCalories = maintenanceCalories;
         strcpy(dietType, "balanced");
     }
 
-    return finalCalories;
+    return calories;
 }
