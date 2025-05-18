@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
 import ctypes
+import os
 
-# Load your DLL
-calcdll = ctypes.CDLL('c:\\Users\\L K Subair\\Documents\\C_PROGRAMS\\miniproj\\caloriecalc.dll')
+dll_path = os.path.join('miniproj', 'caloriecalc.dll')
+calcdll = ctypes.CDLL(dll_path) 
 calcdll.calculateCalories.argtypes = [ctypes.c_float, ctypes.c_float, ctypes.c_int, ctypes.c_char, ctypes.c_char_p, ctypes.c_char_p]
 calcdll.calculateCalories.restype = ctypes.c_float
 
