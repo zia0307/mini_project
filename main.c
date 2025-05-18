@@ -1,52 +1,59 @@
 #include <stdio.h>
 #include <string.h>
-
-//custom module header here
 #include "dietplanner.h"
 
 #define MAX_INGREDIENTS 20
-#define MAX_ALLERGIES 5
-#define MAX_RESTRICTIONS 5
-#define MAX_RECIPES 5
-
-void getUserInfo(float *height, float *weight, int *age, char *sex);
-void getFitnessGoal(char *goal);
-float calculateCalories(float weight, float height, int age, char sex, char goal[20], char *dietType);
-void loadSampleRecipes(Recipe recipes[], int *recipeCount);
-void getAvailableIngredients(char availableIngredients[MAX_INGREDIENTS][50], int *availableCount);
-void suggestRecipes(Recipe recipes[], int recipeCount, char availableIngredients[MAX_INGREDIENTS][50],
-                    int availableCount, char allergies[MAX_ALLERGIES][50], int allergyCount, char dietType[50]);
+#define MAX_RECIPES 10
+#define MAX_ALLERGIES 10
+#define MAX_TAGS 5
 
 int main() {
-    float height, weight;
-    int age;
-    char sex;
-    char goal[20];
-    char dietType[50];
-
-    getUserInfo(&height, &weight, &age, &sex);
-
-    char allergies[MAX_ALLERGIES][50];
-    char restrictions[MAX_RESTRICTIONS][50];
-    int allergyCount = 0, restrictionCount = 0;
-    getUserHealthData(allergies, &allergyCount, restrictions, &restrictionCount);
-
-    getFitnessGoal(goal);
-
-    float calories = calculateCalories(weight, height, age, sex, goal, dietType);
-    printf("\nDaily Caloric Requirement: %.2f kcal\n", calories);
-    printf("Recommended Diet Type: %s\n", dietType);
-
-    // Load recipes
     Recipe recipes[MAX_RECIPES];
     int recipeCount;
-    loadSampleRecipes(recipes, &recipeCount);
 
     char availableIngredients[MAX_INGREDIENTS][50];
-    int availableCount = 0;
+    int availableCount;
+
+    char allergies[MAX_ALLERGIES][50];
+    int allergyCount;
+
+    char dietType[50];
+
+    char selectedTags[MAX_TAGS][20];
+    int selectedTagCount;
+
+    loadSampleRecipes(recipes, &recipeCount);
+
+    printf("Welcome to the Diet Planner Recipe Suggestion System!\n");
+
+    // Get ingredients
     getAvailableIngredients(availableIngredients, &availableCount);
 
-    suggestRecipes(recipes, recipeCount, availableIngredients, availableCount, allergies, allergyCount, dietType);
+    // Get allergies
+    printf("\nHow many allergies do you have? ");
+    scanf("%d", &allergyCount);
+
+    for (int i = 0; i < allergyCount; i++) {
+        printf("Enter allergy %d: ", i + 1);
+        scanf("%s", allergies[i]);
+    }
+
+    // Get diet type
+    printf("\nEnter your diet type (e.g., balanced, low_calorie_low_carb, high_calorie_high_protein): ");
+    scanf("%s", dietType);
+
+    // Get tags
+    printf("\nHow many tags do you want to filter by? (e.g., vegetarian, halal) ");
+    scanf("%d", &selectedTagCount);
+
+    for (int i = 0; i < selectedTagCount; i++) {
+        printf("Enter tag %d: ", i + 1);
+        scanf("%s", selectedTags[i]);
+    }
+
+    // Suggest recipes
+    suggestRecipes(recipes, recipeCount, availableIngredients, availableCount, 
+                   allergies, allergyCount, dietType, selectedTags, selectedTagCount);
 
     return 0;
 }

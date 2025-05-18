@@ -9,6 +9,7 @@
 #define MAX_ALLERGIES 5
 #define MAX_RESTRICTIONS 5
 #define MAX_RECIPES 5
+#define MAX_TAGS 5
 
 // Recipe struct
 typedef struct {
@@ -16,8 +17,10 @@ typedef struct {
     char ingredients[MAX_INGREDIENTS][50];
     int ingredientCount;
     char dietType[50];
-    char foodType[50];
+    char tags[MAX_TAGS][20];
+    int tagCount;
 } Recipe;
+
 
 // Function declarations
 
@@ -37,7 +40,7 @@ float calculateCalories(float weight, float height, int age, char sex, char goal
 // Recipe management
 void loadSampleRecipes(Recipe recipes[], int *recipeCount);
 void getAvailableIngredients(char availableIngredients[MAX_INGREDIENTS][50], int *availableCount);
-void suggestRecipes(Recipe recipes[], int recipeCount, char availableIngredients[MAX_INGREDIENTS][50],
-                    int availableCount, char allergies[MAX_ALLERGIES][50], int allergyCount, char dietType[50]);
+void suggestRecipes(Recipe recipes[], int recipeCount, char availableIngredients[][50], int availableCount, 
+                    char allergies[][50], int allergyCount, char dietType[50], char selectedTags[][20], int selectedTagCount);
 
 #endif // DIETPLANNER_H
