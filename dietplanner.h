@@ -16,6 +16,7 @@ typedef struct {
     char ingredients[MAX_INGREDIENTS][50];
     int ingredientCount;
     char dietType[50];
+    char foodType[50];
 } Recipe;
 
 // Function declarations

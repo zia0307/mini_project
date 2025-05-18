@@ -3,7 +3,7 @@
 #include "dietplanner.h"
 
 #define MAX_INGREDIENTS 20
-#define MAX_RECIPES 5
+#define MAX_RECIPES 10
 
 void loadSampleRecipes(Recipe recipes[], int *recipeCount) {
     *recipeCount = 3; // total number of recipes added
@@ -11,6 +11,7 @@ void loadSampleRecipes(Recipe recipes[], int *recipeCount) {
     // Recipe 1
     strcpy(recipes[0].name, "Oatmeal with Fruits");
     recipes[0].ingredientCount = 3;
+    strcpy(recipes[5].foodType, "vegetarian");
     strcpy(recipes[0].ingredients[0], "oats");
     strcpy(recipes[0].ingredients[1], "milk");
     strcpy(recipes[0].ingredients[2], "banana");
@@ -19,19 +20,52 @@ void loadSampleRecipes(Recipe recipes[], int *recipeCount) {
     // Recipe 2
     strcpy(recipes[1].name, "Grilled Chicken Salad");
     recipes[1].ingredientCount = 4;
+    strcpy(recipes[1].foodType, "halal");
     strcpy(recipes[1].ingredients[0], "chicken");
     strcpy(recipes[1].ingredients[1], "lettuce");
-    strcpy(recipes[1].ingredients[2], "olive_oil");
+    strcpy(recipes[1].ingredients[2], "olive oil");
     strcpy(recipes[1].ingredients[3], "lemon");
     strcpy(recipes[1].dietType, "low_calorie_low_carb");
 
     // Recipe 3
     strcpy(recipes[2].name, "Protein Shake");
     recipes[2].ingredientCount = 3;
-    strcpy(recipes[2].ingredients[0], "protein_powder");
+    strcpy(recipes[2].foodType, "vegetarian");
+    strcpy(recipes[2].ingredients[0], "protein powder");
     strcpy(recipes[2].ingredients[1], "milk");
     strcpy(recipes[2].ingredients[2], "banana");
     strcpy(recipes[2].dietType, "high_calorie_high_protein");
+
+    //Recipe 4 
+    strcpy(recipes[3].name, "Veggie Burger");
+    strcpy(recipes[3].foodType, "vegetarian");
+    recipes[3].ingredientCount = 4;
+    strcpy(recipes[3].ingredients[0], "veggie patty");
+    strcpy(recipes[3].ingredients[1], "bun");
+    strcpy(recipes[3].ingredients[2], "lettuce");
+    strcpy(recipes[3].ingredients[3], "tomato");
+    strcpy(recipes[3].dietType, "balanced");
+
+    //Recipe 5
+    strcpy(recipes[4].name, "Chicken Fajitas");
+    strcpy(recipes[5].foodType, "halal");
+    recipes[4].ingredientCount = 4;
+    strcpy(recipes[4].ingredients[0], "chicken");
+    strcpy(recipes[4].ingredients[1], "bell peppers");
+    strcpy(recipes[4].ingredients[2], "onion");
+    strcpy(recipes[4].ingredients[3], "fajita seasoning");
+    strcpy(recipes[4].dietType, "low_calorie_low_carb");
+
+    //Recipe 6 
+    strcpy(recipes[5].name, "Paneer Tikka");
+    strcpy(recipes[5].dietType, "high_calorie_high_protein");
+    strcpy(recipes[5].foodType, "vegetarian");
+    recipes[0].ingredientCount = 3;
+    strcpy(recipes[5].ingredients[0], "paneer");
+    strcpy(recipes[5].ingredients[1], "yogurt");
+    strcpy(recipes[5].ingredients[2], "spices");
+
+
 }
 
 void suggestRecipes(Recipe recipes[], int recipeCount, char availableIngredients[][50], int availableCount, 
