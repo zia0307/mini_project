@@ -1,12 +1,14 @@
+//this is a combined recipe.c + caloriecalc.c that is all cleaned up no printf scanf and ready for DLL use 
 #include <stdio.h>
 #include <string.h>
 #include "dietplanner.h"
 
-#define MAX_INGREDIENTS 20
-#define MAX_RECIPES 10
+// Sample Recipes (global for simplicity)
+Recipe recipes[MAX_RECIPES];
+int recipeCount = 0;
 
-void loadSampleRecipes(Recipe recipes[], int *recipeCount) {
-    *recipeCount = 7; // total number of recipes added
+void loadSampleRecipes() {
+    recipeCount = 7;
 
     // Recipe 1
     strcpy(recipes[0].name, "Oatmeal with Fruits");
@@ -87,76 +89,55 @@ void loadSampleRecipes(Recipe recipes[], int *recipeCount) {
     strcpy(recipes[6].tags[0], "vegetarian");
 }
 
-void getAvailableIngredients(char availableIngredients[MAX_INGREDIENTS][50], int *availableCount) {
-    printf("\nHow many ingredients do you have available? ");
-    scanf("%d", availableCount);
+float calculateCalories(float weight, float height, int age, char sex, const char* goal, char* outDietType) {
+    float bmr;
+    if (sex == 'M' || sex == 'm') {
+        bmr = 10 * weight + 6.25 * (height * 100) - 5 * age + 5;
+    } else {
+        bmr = 10 * weight + 6.25 * (height * 100) - 5 * age - 161;
+    }
 
-    for (int i = 0; i < *availableCount; i++) {
-        printf("Enter ingredient %d: ", i + 1);
-        scanf("%s", availableIngredients[i]);
+    if (strcmp(goal, "bulk") == 0) {
+        strcpy(outDietType, "high_calorie_high_protein");
+        return bmr + 500;
+    } else if (strcmp(goal, "cut") == 0) {
+        strcpy(outDietType, "low_calorie_low_carb");
+        return bmr - 500;
+    } else {
+        strcpy(outDietType, "balanced");
+        return bmr;
     }
 }
 
-void suggestRecipes(Recipe recipes[], int recipeCount, char availableIngredients[][50], int availableCount, 
-                    char allergies[][50], int allergyCount, char dietType[50], char selectedTags[][20], int selectedTagCount) {
-
-    printf("\n--- Suggested Recipes ---\n");
+void suggestRecipes(const char* dietType, char ingredients[][50], int ingredientCount, char resultBuffer[5000]) {
+    char result[5000] = "";
     int found = 0;
-    float threshold = 0.7;  // 70% ingredients match threshold
 
     for (int i = 0; i < recipeCount; i++) {
-        // Check diet type match
         if (strcmp(recipes[i].dietType, dietType) != 0)
             continue;
 
-        // Check if recipe has ALL selected tags
-        int matchesTags = 1;
-        for (int t = 0; t < selectedTagCount; t++) {
-            int tagFound = 0;
-            for (int j = 0; j < recipes[i].tagCount; j++) {
-                if (strcmp(selectedTags[t], recipes[i].tags[j]) == 0) {
-                    tagFound = 1;
-                    break;
-                }
-            }
-            if (!tagFound) {
-                matchesTags = 0;
-                break;
-            }
-        }
-        if (!matchesTags)
-            continue;
-
-        // Check for matching ingredients and allergies
-        int matchingIngredients = 0;
-        int totalIngredients = recipes[i].ingredientCount;
-        int allergic = 0;
-
-        for (int j = 0; j < totalIngredients; j++) {
-            // Check allergy
-            for (int m = 0; m < allergyCount; m++) {
-                if (strcmp(recipes[i].ingredients[j], allergies[m]) == 0) {
-                    allergic = 1;
-                    break;
-                }
-            }
-            if (allergic) break;
-
-            // Check availability
-            for (int k = 0; k < availableCount; k++) {
-                if (strcmp(recipes[i].ingredients[j], availableIngredients[k]) == 0) {
-                    matchingIngredients++;
+        int matchCount = 0;
+        for (int j = 0; j < recipes[i].ingredientCount; j++) {
+            for (int k = 0; k < ingredientCount; k++) {
+                if (strcmp(recipes[i].ingredients[j], ingredients[k]) == 0) {
+                    matchCount++;
                     break;
                 }
             }
         }
 
-        if (!allergic && ((float)matchingIngredients / totalIngredients) >= threshold) {
-            printf("- %s (You have %d of %d ingredients)\n", recipes[i].name, matchingIngredients, totalIngredients);
+        float matchRatio = (float)matchCount / recipes[i].ingredientCount;
+        if (matchRatio >= 0.7) {
+            strcat(result, recipes[i].name);
+            strcat(result, "\n");
             found = 1;
         }
     }
 
-    if (!found)
-        printf("No recipes available based on your ingredients, allergies, diet plan, and tags.\n");
+    if (!found) {
+        strcpy(result, "No matching recipes found.\n");
+    }
+
+    strcpy(resultBuffer, result);
 }
