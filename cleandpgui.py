@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 # Load the DLL
-dietdll = ctypes.CDLL(r'miniproj\dietplanner.dll')
+dietdll = ctypes.CDLL(r'C:\Users\L K Subair\Documents\C_PROGRAMS\miniproj\dietplanner.dll')
 
 # Set argument and return types
 dietdll.loadSampleRecipes.restype = None
@@ -27,10 +27,10 @@ dietdll.loadSampleRecipes()
 unique_ingredients = [
     "oats", "milk", "banana", "chicken", "lettuce", "olive oil", "lemon",
     "protein powder", "veggie patty", "bun", "tomato", "bell peppers", "onion",
-    "fajita seasoning", "paneer", "yogurt", "spices", "mangoes", "honey"
+    "fajita seasoning", "paneer", "yogurt", "spices", "mangoes", "honey","cucumber","salad dressing"
 ]
 
-unique_tags = ["vegetarian", "halal", "vegan"]
+unique_tags = ["vegetarian", "halal", "vegan","jain"]
 
 # GUI function for calculation and recipe suggestion
 def runPlanner():

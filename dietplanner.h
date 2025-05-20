@@ -1,4 +1,4 @@
-#ifndef DIETPLANNER_H
+#ifndef DIETPLANNER_H //this is an inclusion guard- i don't want multiple inclusions of this header file 
 #define DIETPLANNER_H
 
 #define MAX_INGREDIENTS 20
@@ -12,7 +12,8 @@ typedef struct Recipe {
     char dietType[50];
     char tags[MAX_TAGS][20];
     int tagCount;
-    struct Recipe* connections[MAX_RECIPES];
+    struct Recipe* connections[MAX_RECIPES]; //these are your graph edges 
+    //each node is a recipe and the edges are the connections between them
     int connectionCount;
 } Recipe;
 
@@ -26,7 +27,7 @@ void suggestRecipes(
     int allergyCount,
     char restrictions[][20],
     int restrictionCount,
-    char resultBuffer[5000]
+    char resultBuffer[5000] //the function will write the result here and the GUI will decode & display it
 );
 
-#endif
+#endif 

@@ -51,7 +51,7 @@ void connectRecipes() {
 }
 
 void loadSampleRecipes() {
-    recipeCount = 7;
+    recipeCount = 9;
 
     // Recipe 1
     strcpy(recipes[0].name, "Oatmeal with Fruits");
@@ -134,11 +134,24 @@ void loadSampleRecipes() {
     //Recipe 8
     strcpy(recipes[7].name, "chana masala");
     strcpy(recipes[7].dietType, "low_calorie_high_protein");
-    strcpy(recipes[6].tags[0], "vegetarian");
+    strcpy(recipes[7].tags[0], "vegetarian");
     recipes[7].ingredientCount = 3;
-    strcpy(recipes[6].ingredients[7], "Chickpeas");
-    strcpy(recipes[6].ingredients[7], "vegetables");
-    strcpy(recipes[6].ingredients[7],"spices");
+    recipes[7].tagCount = 1;
+    strcpy(recipes[7].ingredients[0], "Chickpeas");
+    strcpy(recipes[7].ingredients[1], "vegetables");
+    strcpy(recipes[7].ingredients[2],"spices");
+
+    //Recipe 9 
+    strcpy( recipes[8].name, "chicken satay salad");
+    strcpy(recipes[8].dietType, "balanced");
+    recipes[8].ingredientCount = 4;
+    strcpy(recipes[8].ingredients[0], "chicken");
+    strcpy(recipes[8].ingredients[1], "cucumber");
+    strcpy(recipes[8].ingredients[2], "spices");
+    strcpy(recipes[8].ingredients[3], "salad dressing");
+    strcpy(recipes[8].ingredients[4], "lemon");
+    recipes[8].tagCount = 1;
+    strcpy(recipes[8].tags[0], "halal");
 
     connectRecipes();
 }
