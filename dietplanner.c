@@ -2,10 +2,52 @@
 #include <stdio.h>
 #include <string.h>
 #include "dietplanner.h"
+#include <stdbool.h>
 
-// Sample Recipes (global for simplicity)
+// Sample Recipes
 Recipe recipes[MAX_RECIPES];
 int recipeCount = 0;
+
+void addConnection(Recipe* a, Recipe* b) {
+    a->connections[a->connectionCount++] = b;
+}
+
+void connectRecipes() {
+    for (int i = 0; i < recipeCount; i++) {
+        for (int j = i + 1; j < recipeCount; j++) {
+            int connect = 0;
+
+            // Match diet type
+            if (strcmp(recipes[i].dietType, recipes[j].dietType) == 0)
+                connect = 1;
+
+            // Match any common ingredient
+            for (int m = 0; m < recipes[i].ingredientCount && !connect; m++) {
+                for (int n = 0; n < recipes[j].ingredientCount; n++) {
+                    if (strcmp(recipes[i].ingredients[m], recipes[j].ingredients[n]) == 0) {
+                        connect = 1;
+                        break;
+                    }
+                }
+            }
+
+            // Match any common tag
+            for (int m = 0; m < recipes[i].tagCount && !connect; m++) {
+                for (int n = 0; n < recipes[j].tagCount; n++) {
+                    if (strcmp(recipes[i].tags[m], recipes[j].tags[n]) == 0) {
+                        connect = 1;
+                        break;
+                    }
+                }
+            }
+
+            if (connect) {
+                addConnection(&recipes[i], &recipes[j]);
+                addConnection(&recipes[j], &recipes[i]);
+            }
+        }
+    }
+}
 
 void loadSampleRecipes() {
     recipeCount = 7;
@@ -87,57 +129,107 @@ void loadSampleRecipes() {
     strcpy(recipes[6].dietType, "high_calorie_high_protein");
     recipes[6].tagCount = 1;
     strcpy(recipes[6].tags[0], "vegetarian");
+
+    connectRecipes();
 }
 
-float calculateCalories(float weight, float height, int age, char sex, const char* goal, char* outDietType) {
-    float bmr;
-    if (sex == 'M' || sex == 'm') {
-        bmr = 10 * weight + 6.25 * (height * 100) - 5 * age + 5;
-    } else {
-        bmr = 10 * weight + 6.25 * (height * 100) - 5 * age - 161;
-    }
+float calculateCalories(float weight, float height, int age, char sex, const char *goal, char *dietType) {
+    float calories;
+
+    if (sex == 'M' || sex == 'm')
+        calories = 10 * weight + 6.25 * height * 100 - 5 * age + 5;
+    else
+        calories = 10 * weight + 6.25 * height * 100 - 5 * age - 161;
 
     if (strcmp(goal, "bulk") == 0) {
-        strcpy(outDietType, "high_calorie_high_protein");
-        return bmr + 500;
+        calories += 500;
+        strcpy(dietType, "high_calorie_high_protein");
     } else if (strcmp(goal, "cut") == 0) {
-        strcpy(outDietType, "low_calorie_low_carb");
-        return bmr - 500;
+        calories -= 500;
+        strcpy(dietType, "low_calorie_low_carb");
     } else {
-        strcpy(outDietType, "balanced");
-        return bmr;
+        strcpy(dietType, "balanced");
     }
+
+    return calories;
 }
 
-void suggestRecipes(const char* dietType, char ingredients[][50], int ingredientCount, char resultBuffer[5000]) {
-    char result[5000] = "";
-    int found = 0;
-
-    for (int i = 0; i < recipeCount; i++) {
-        if (strcmp(recipes[i].dietType, dietType) != 0)
-            continue;
-
-        int matchCount = 0;
-        for (int j = 0; j < recipes[i].ingredientCount; j++) {
-            for (int k = 0; k < ingredientCount; k++) {
-                if (strcmp(recipes[i].ingredients[j], ingredients[k]) == 0) {
-                    matchCount++;
-                    break;
-                }
+int isTagRestricted(Recipe* r, char restrictions[][20], int restrictionCount) {
+    for (int i = 0; i < restrictionCount; i++) {
+        int found = 0;
+        for (int j = 0; j < r->tagCount; j++) {
+            if (strcmp(r->tags[j], restrictions[i]) == 0) {
+                found = 1;
+                break;
             }
         }
+        if (!found) return 1;
+    }
+    return 0;
+}
 
-        float matchRatio = (float)matchCount / recipes[i].ingredientCount;
-        if (matchRatio >= 0.7) {
-            strcat(result, recipes[i].name);
-            strcat(result, "\n");
-            found = 1;
+int hasAllergy(Recipe* r, char allergies[][50], int allergyCount) {
+    for (int i = 0; i < r->ingredientCount; i++) {
+        for (int j = 0; j < allergyCount; j++) {
+            if (strcmp(r->ingredients[i], allergies[j]) == 0)
+                return 1;
         }
     }
+    return 0;
+}
 
-    if (!found) {
-        strcpy(result, "No matching recipes found.\n");
+int hasIngredients(Recipe* r, char ingredients[][50], int count) {
+    int matches = 0;
+    for (int i = 0; i < r->ingredientCount; i++) {
+        for (int j = 0; j < count; j++) {
+            if (strcmp(r->ingredients[i], ingredients[j]) == 0)
+                matches++;
+        }
+    }
+    return matches;
+}
+
+void suggestRecipes(const char* dietType, char ingredients[][50], int ingredientCount,
+                    char allergies[][50], int allergyCount, char restrictions[][20],
+                    int restrictionCount, char resultBuffer[5000]) {
+    resultBuffer[0] = '\0';
+
+    int visited[MAX_RECIPES] = {0};
+    int queue[MAX_RECIPES];
+    int front = 0, rear = 0;
+
+    // Enqueue recipes matching dietType
+    for (int i = 0; i < recipeCount; i++) {
+        if (strcmp(recipes[i].dietType, dietType) == 0)
+            queue[rear++] = i;
     }
 
-    strcpy(resultBuffer, result);
+    while (front < rear) {
+        int current = queue[front++];
+        if (visited[current]) continue;
+        visited[current] = 1;
+
+        Recipe *r = &recipes[current];
+
+        // Allergy check
+        if (hasAllergy(r, allergies, allergyCount)) continue;
+
+        // Restriction check
+        if (isTagRestricted(r, restrictions, restrictionCount)) continue;
+
+        // Ingredient availability check
+        if (hasIngredients(r, ingredients, ingredientCount) == 0) continue;
+
+        // Add to result
+        strcat(resultBuffer, r->name);
+        strcat(resultBuffer, "\n");
+
+        // Enqueue connected recipes
+        for (int k = 0; k < r->connectionCount; k++) {
+            int idx = r->connections[k] - recipes;
+            if (!visited[idx])
+                queue[rear++] = idx;
+        }
+    }
 }
+
