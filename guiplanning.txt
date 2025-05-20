@@ -1,7 +1,0 @@
-here's what im supposed to do:
-
-take all my c code and compile it into a shared library (so i can use it in other programs)
-that's a .dll on windows and a .so on linux
-in python im gonna use the foreign function library to call the functions in the c code
-ctypes is the library i should use for this
-then in python ill use tkinter to create a simple gui to interact with the c code
