@@ -186,7 +186,7 @@ int isTagRestricted(Recipe* r, char restrictions[][20], int restrictionCount) {
                 break;
             }
         }
-        if (!found) return 1;  // If any restriction not found => not suitable
+        if (!found) return 1;  // If any restriction not found: not suitable
     }
     return 0;  // All restrictions matched
 }

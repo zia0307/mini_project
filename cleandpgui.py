@@ -23,7 +23,7 @@ dietdll.suggestRecipes.restype = None
 # Load sample data
 dietdll.loadSampleRecipes()
 
-# === Recipe data extracted ===
+#Recipe data extracted
 unique_ingredients = [
     "oats", "milk", "banana", "chicken", "lettuce", "olive oil", "lemon",
     "protein powder", "veggie patty", "bun", "tomato", "bell peppers", "onion",
