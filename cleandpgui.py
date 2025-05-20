@@ -3,87 +3,62 @@ from ctypes import *
 import tkinter as tk
 from tkinter import messagebox
 
+# Load the DLL
 dietdll = ctypes.CDLL(r'miniproj\dietplanner.dll')
 
+# Set argument and return types
 dietdll.loadSampleRecipes.restype = None
 dietdll.calculateCalories.argtypes = [c_float, c_float, c_int, c_char, c_char_p, POINTER(c_char)]
 dietdll.calculateCalories.restype = c_float
 
 dietdll.suggestRecipes.argtypes = [
     c_char_p,
-    c_char * 50 * 50,  # ingredients
-    c_int,
-    c_char * 50 * 50,  # allergies
-    c_int,
-    c_char * 20 * 20,  # restrictions
-    c_int,
-    c_char * 5000      # result buffer
+    (c_char * 50) * 20, c_int,          # ingredients
+    (c_char * 50) * 5, c_int,           # allergies
+    (c_char * 20) * 5, c_int,           # restrictions
+    c_char * 5000                       # result buffer
 ]
 dietdll.suggestRecipes.restype = None
 
-dietdll.suggestRecipes.argtypes = [
-    c_char_p,
-    (c_char * 50) * 20, c_int,
-    (c_char * 50) * 5, c_int,
-    (c_char * 20) * 5, c_int,
-    c_char * 5000
-]
-dietdll.suggestRecipes.restype = None
-
+# Load sample data
 dietdll.loadSampleRecipes()
 
-dietTypeBuffer = create_string_buffer(50)
-calories = dietdll.calculateCalories(
-    70.0, 1.75, 25, b'M', b'bulk', dietTypeBuffer
-)
-print(f"Calories: {calories}, Diet Type: {dietTypeBuffer.value.decode()}")
+# === Recipe data extracted ===
+unique_ingredients = [
+    "oats", "milk", "banana", "chicken", "lettuce", "olive oil", "lemon",
+    "protein powder", "veggie patty", "bun", "tomato", "bell peppers", "onion",
+    "fajita seasoning", "paneer", "yogurt", "spices", "mangoes", "honey"
+]
 
-'''ingredients = (c_char * 50 * 50)()
-allergies = (c_char * 50 * 50)()
-restrictions = (c_char * 20 * 20)()
+unique_tags = ["vegetarian", "halal", "vegan"]
 
-#fill ingredient array
-ingredient_list = [b"chicken", b"lettuce"]
-for i, ing in enumerate(ingredient_list):
-    ingredients[i].value = ing
-
-ingredient_count = len(ingredient_list)
-
-# Similarly fill allergies and restrictions if any
-allergy_list = []
-restriction_list = [b"halal"]
-
-for i, al in enumerate(allergy_list):
-    allergies[i].value = al
-
-for i, res in enumerate(restriction_list):
-    restrictions[i].value = res
-
-allergy_count = len(allergy_list)
-restriction_count = len(restriction_list)'''
-
-
+# GUI function for calculation and recipe suggestion
 def runPlanner():
     try:
+        # Input retrieval
         w = float(weight_entry.get())
         h = float(height_entry.get())
         a = int(age_entry.get())
         s = sex_var.get().encode()
         g = goal_var.get().encode()
 
+        # Get calorie and diet type
         outDietType = create_string_buffer(50)
         calories = dietdll.calculateCalories(w, h, a, s[0], g, outDietType)
 
         result = f"Calories: {calories:.2f} kcal\nDiet Type: {outDietType.value.decode()}\n\nRecipes:\n"
 
-        ingList = [e.strip() for e in ingredients_entry.get().split(",") if e.strip()]
-        allergList = [e.strip() for e in allergies_entry.get().split(",") if e.strip()]
+        # Parse ingredients, allergies, and restrictions
+        ingList = [e.strip().lower() for e in ingredients_entry.get().split(",") if e.strip()]
+        allergList = [e.strip().lower() for e in allergies_entry.get().split(",") if e.strip()]
         restrictions = []
-        if halal_var.get(): restrictions.append("Halal")
-        if vegetarian_var.get(): restrictions.append("Vegetarian")
-        if vegan_var.get(): restrictions.append("Vegan")
-        if jain_var.get(): restrictions.append("Jain")
+        if halal_var.get(): restrictions.append("halal")
+        if vegetarian_var.get(): restrictions.append("vegetarian")
+        if vegan_var.get(): restrictions.append("vegan")
+        if jain_var.get(): restrictions.append("jain")
 
+
+        # Fill C-style arrays
         ingArr = ((c_char * 50) * 20)()
         for i, item in enumerate(ingList):
             ingArr[i].value = item.encode()
@@ -96,11 +71,17 @@ def runPlanner():
         for i, item in enumerate(restrictions):
             restrArr[i].value = item.encode()
 
+        # Call DLL function to get recipe suggestions
         resultBuffer = (c_char * 5000)()
-        dietdll.suggestRecipes(outDietType, ingArr, len(ingList), allgArr, len(allergList), restrArr, len(restrictions), resultBuffer)
+        dietdll.suggestRecipes(
+            outDietType, 
+            ingArr, len(ingList), 
+            allgArr, len(allergList), 
+            restrArr, len(restrictions), 
+            resultBuffer
+        )
 
         result += resultBuffer.value.decode() or "No matching recipes."
-
 
         result_text.delete(1.0, tk.END)
         result_text.insert(tk.END, result)
@@ -108,6 +89,7 @@ def runPlanner():
     except Exception as e:
         messagebox.showerror("Error", str(e))
 
+# GUI layout
 root = tk.Tk()
 root.title("Diet Planner")
 
@@ -155,18 +137,3 @@ result_text = tk.Text(root, height=15, width=50)
 result_text.pack(padx=10, pady=10)
 
 root.mainloop()
-
-'''resultBuffer = create_string_buffer(5000)
-
-dietlib.suggestRecipes(
-    dietTypeBuffer.value,
-    ingredients,
-    ingredient_count,
-    allergies,
-    allergy_count,
-    restrictions,
-    restriction_count,
-    resultBuffer
-)
-
-print("Suggestions:\n", resultBuffer.value.decode())'''

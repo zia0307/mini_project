@@ -3,6 +3,7 @@
 #include <string.h>
 #include "dietplanner.h"
 #include <stdbool.h>
+#include<strings.h> //strcasecmp()
 
 // Sample Recipes
 Recipe recipes[MAX_RECIPES];
@@ -18,13 +19,13 @@ void connectRecipes() {
             int connect = 0;
 
             // Match diet type
-            if (strcmp(recipes[i].dietType, recipes[j].dietType) == 0)
+            if (strcasecmp(recipes[i].dietType, recipes[j].dietType) == 0)
                 connect = 1;
 
             // Match any common ingredient
             for (int m = 0; m < recipes[i].ingredientCount && !connect; m++) {
                 for (int n = 0; n < recipes[j].ingredientCount; n++) {
-                    if (strcmp(recipes[i].ingredients[m], recipes[j].ingredients[n]) == 0) {
+                    if (strcasecmp(recipes[i].ingredients[m], recipes[j].ingredients[n]) == 0) {
                         connect = 1;
                         break;
                     }
@@ -34,7 +35,7 @@ void connectRecipes() {
             // Match any common tag
             for (int m = 0; m < recipes[i].tagCount && !connect; m++) {
                 for (int n = 0; n < recipes[j].tagCount; n++) {
-                    if (strcmp(recipes[i].tags[m], recipes[j].tags[n]) == 0) {
+                    if (strcasecmp(recipes[i].tags[m], recipes[j].tags[n]) == 0) {
                         connect = 1;
                         break;
                     }
@@ -130,6 +131,15 @@ void loadSampleRecipes() {
     recipes[6].tagCount = 1;
     strcpy(recipes[6].tags[0], "vegetarian");
 
+    //Recipe 8
+    strcpy(recipes[7].name, "chana masala");
+    strcpy(recipes[7].dietType, "low_calorie_high_protein");
+    strcpy(recipes[6].tags[0], "vegetarian");
+    recipes[7].ingredientCount = 3;
+    strcpy(recipes[6].ingredients[7], "Chickpeas");
+    strcpy(recipes[6].ingredients[7], "vegetables");
+    strcpy(recipes[6].ingredients[7],"spices");
+
     connectRecipes();
 }
 
@@ -158,14 +168,14 @@ int isTagRestricted(Recipe* r, char restrictions[][20], int restrictionCount) {
     for (int i = 0; i < restrictionCount; i++) {
         int found = 0;
         for (int j = 0; j < r->tagCount; j++) {
-            if (strcmp(r->tags[j], restrictions[i]) == 0) {
+            if (strcasecmp(r->tags[j], restrictions[i]) == 0) {
                 found = 1;
                 break;
             }
         }
-        if (!found) return 1;
+        if (!found) return 1;  // If any restriction not found => not suitable
     }
-    return 0;
+    return 0;  // All restrictions matched
 }
 
 int hasAllergy(Recipe* r, char allergies[][50], int allergyCount) {
