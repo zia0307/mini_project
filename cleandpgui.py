@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 # Load the DLL
-dietdll = ctypes.CDLL(r'C:\Users\L K Subair\Documents\C_PROGRAMS\miniproj\dietplanner.dll')
+dietdll = ctypes.CDLL(r'miniproj\dietplanner.dll')
 
 # Set argument and return types
 dietdll.loadSampleRecipes.restype = None
